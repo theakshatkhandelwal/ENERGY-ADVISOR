@@ -144,7 +144,7 @@ def dashboard():
 	if goal_month_cost > 0:
 		progress_cost = int(max(0, min(100, (goal_month_cost / max(kpis["monthly_cost"], 0.0001)) * 100)))
 
-		return render_template(
+	return render_template(
 		"dashboard.html",
 		user=user,
 		kpis=kpis,
