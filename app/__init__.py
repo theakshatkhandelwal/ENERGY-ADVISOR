@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from pathlib import Path
 import os
+from sqlalchemy.pool import NullPool
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -35,6 +36,12 @@ def create_app(test_config: dict | None = None) -> Flask:
 		app.config.update(test_config)
 
 	# Initialize extensions
+	# Use NullPool in serverless to avoid holding connections
+	engine_options = {"pool_pre_ping": True}
+	if os.environ.get("VERCEL") or os.environ.get("SERVERLESS"):
+		engine_options["poolclass"] = NullPool
+
+	app.config.setdefault("SQLALCHEMY_ENGINE_OPTIONS", engine_options)
 	db.init_app(app)
 	migrate.init_app(app, db)
 

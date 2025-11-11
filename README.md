@@ -39,6 +39,15 @@ pytest -q
   docker run -p 5000:5000 energy-advisor
   ```
 - Render: set start command to `gunicorn wsgi:app`
+- Vercel + Neon (Postgres):
+  1) Ensure these files exist:
+     - `vercel.json`
+     - `api/index.py` (imports `app` from `wsgi.py`)
+  2) Create a Neon database and copy the connection string.
+     - Set Vercel env var `DATABASE_URL` to your Neon URL (include `sslmode=require` if provided).
+     - Set `SECRET_KEY` (any random string).
+  3) Push to GitHub and import the repo in Vercel.
+  4) First deploy will run with serverless-safe SQLAlchemy (NullPool). PDF export may be disabled if WeasyPrint deps are missing.
 
 ### Formulas
 - Daily energy: E_daily = Σ(P × N × T) / 1000
