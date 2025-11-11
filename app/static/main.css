@@ -1,0 +1,16 @@
+body { background: #f6f8fb; }
+.navbar-brand { font-weight: 600; letter-spacing: 0.2px; }
+.brand-icon { font-size: 1.1rem; }
+.card { border-radius: 10px; }
+.table thead th { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .03rem; }
+.display-6 { font-weight: 700; }
+
+/* Section spacing and subtle theming */
+.card-body { padding: 1rem 1.25rem; }
+main.container { max-width: 1100px; }
+.kpi-card .h4 { margin: 0; }
+
+/* Buttons polish */
+.btn-outline-primary { border-width: 1px; }
+
+

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h3 class="mb-0">Scenario Simulator</h3>
+	<div class="text-muted small">Pick measures → save → compare with baseline</div>
+	</div>
+<form method="post" class="row g-3 align-items-end mb-3">
+	<div class="col-md-3">
+		<label class="form-label">Scenario name</label>
+		<input name="name" class="form-control" value="My Scenario">
+	</div>
+	<div class="col-md-6">
+		<label class="form-label">Apply measures</label>
+		<select name="measures" class="form-select" multiple size="6">
+			{% for r in recs %}
+				<option value="{{ r.code }}">{{ r.title }} (Δ₹ {{ r.delta_cost_month }}, ΔkWh {{ r.delta_kwh_month }})</option>
+			{% endfor %}
+		</select>
+	</div>
+	<div class="col-md-3">
+		<button class="btn btn-primary">Save scenario</button>
+		<div class="form-text">Hold Ctrl/Cmd to multi-select</div>
+	</div>
+</form>
+
+<div class="row g-3 mb-3">
+	<div class="col-md-4">
+		<div class="card shadow-sm"><div class="card-body">
+			<div class="fw-bold mb-2">Baseline (Monthly)</div>
+			<div class="mb-1">Energy: <strong>{{ kpis_base.monthly_kwh }}</strong> kWh</div>
+			<div class="mb-1">Cost: <strong>₹ {{ kpis_base.monthly_cost }}</strong></div>
+			<div class="mb-1">CO₂: <strong>{{ kpis_base.monthly_co2 }}</strong> kg</div>
+		</div></div>
+	</div>
+	<div class="col-md-8">
+		<div class="card shadow-sm"><div class="card-body">
+			<canvas id="barChart" height="120"></canvas>
+			<div class="small text-muted mt-2">Baseline vs latest scenario (kWh/month)</div>
+		</div></div>
+	</div>
+</div>
+
+{% if scenarios %}
+<div class="row g-3 mb-3">
+	{% set latest = scenarios[-1] %}
+	<div class="col-md-4">
+		<div class="card border-0 shadow-sm"><div class="card-body">
+			<div class="fw-bold">Latest scenario</div>
+			<div class="h5 mb-0">{{ latest.name }}</div>
+		</div></div>
+	</div>
+	<div class="col-md-8">
+		<div class="row g-3">
+			<div class="col-md-4">
+				<div class="card kpi-card text-center shadow-sm border-0"><div class="card-body">
+					<div class="text-muted small">ΔkWh/mo</div>
+					<div class="h4 text-success">-{{ latest.saved_kwh }}</div>
+				</div></div>
+			</div>
+			<div class="col-md-4">
+				<div class="card kpi-card text-center shadow-sm border-0"><div class="card-body">
+					<div class="text-muted small">Δ₹/mo</div>
+					<div class="h4 text-success">-{{ latest.saved_cost }}</div>
+				</div></div>
+			</div>
+			<div class="col-md-4">
+				<div class="card kpi-card text-center shadow-sm border-0"><div class="card-body">
+					<div class="text-muted small">ΔCO₂/mo (kg)</div>
+					<div class="h4 text-success">-{{ latest.saved_co2 }}</div>
+				</div></div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="card shadow-sm mb-3"><div class="card-body">
+	<div class="fw-bold mb-2">Savings by measure (kWh/month)</div>
+	<canvas id="measureChart" height="120"></canvas>
+</div></div>
+{% endif %}
+
+<div class="card shadow-sm"><div class="card-body">
+	<h5>Saved Scenarios</h5>
+	<table class="table table-sm align-middle">
+		<thead><tr><th>Name</th><th>ΔkWh</th><th>Δ₹</th><th>ΔCO₂</th></tr></thead>
+		<tbody>
+		{% for s in scenarios %}
+			<tr>
+				<td>{{ s.name }}</td>
+				<td>{{ s.saved_kwh }}</td>
+				<td>{{ s.saved_cost }}</td>
+				<td>{{ s.saved_co2 }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div></div>
+
+<script>
+if ({{ (bar_labels|length) if bar_labels is defined else 0 }}) {
+	const barCtx = document.getElementById('barChart');
+	new Chart(barCtx, {
+		type: 'bar',
+		data: {
+			labels: {{ bar_labels|safe }},
+			datasets: [{ data: {{ bar_values|safe }}, backgroundColor: ['#6c8ae4','#59a14f'] }]
+		},
+		options: {
+			plugins: { legend: { display: false } },
+			scales: { y: { title: { display: true, text: 'kWh/month' }, beginAtZero: true } }
+		}
+	});
+}
+if ({{ (measure_labels|length) if measure_labels is defined else 0 }}) {
+	const mc = document.getElementById('measureChart');
+	new Chart(mc, {
+		type: 'bar',
+		data: {
+			labels: {{ measure_labels|safe }},
+			datasets: [{ data: {{ measure_values|safe }}, backgroundColor: '#4e79a7' }]
+		},
+		options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+	});
+}
+</script>
+{% endblock %}
+
+

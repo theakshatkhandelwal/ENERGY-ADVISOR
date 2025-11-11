@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Assumptions</h3>
+<form method="post" class="row g-3">
+	{% for key, val in assumptions.items() %}
+	<div class="col-md-4">
+		<label class="form-label">{{ key }}</label>
+		<input class="form-control" name="{{ key }}" type="number" step="0.0001" value="{{ val }}">
+	</div>
+	{% endfor %}
+	<div class="col-12">
+		<button class="btn btn-primary">Save</button>
+	</div>
+	<div class="col-12 small text-muted">
+		Editable coefficients include AC coefficient per degree, default LED wattage, standby power and hours, and lighting retrofit cost per unit.
+	</div>
+	</form>
+{% endblock %}
+
+

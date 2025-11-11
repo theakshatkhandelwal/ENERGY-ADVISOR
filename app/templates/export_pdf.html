@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style>
+	body { font-family: Arial, sans-serif; }
+	h1 { margin-bottom: 0; }
+	table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+	th, td { border: 1px solid #ddd; padding: 6px; font-size: 12px; }
+	.kpi { display: inline-block; margin-right: 16px; }
+	</style>
+</head>
+<body>
+	<h1>Energy Report</h1>
+	<div class="kpi"><strong>kWh/month:</strong> {{ kpis.monthly_kwh }}</div>
+	<div class="kpi"><strong>₹/month:</strong> {{ kpis.monthly_cost }}</div>
+	<div class="kpi"><strong>CO₂ kg/month:</strong> {{ kpis.monthly_co2 }}</div>
+	<h3>Appliances</h3>
+	<table>
+		<thead><tr><th>Type</th><th>W</th><th>Qty</th><th>H/day</th><th>D/week</th><th>kWh/day</th></tr></thead>
+		<tbody>
+		{% for a in appliances %}
+		<tr>
+			<td>{{ a.type }}</td><td>{{ a.power_w }}</td><td>{{ a.quantity }}</td><td>{{ a.hours_per_day }}</td><td>{{ a.days_per_week }}</td><td>{{ '%.3f'|format(a.daily_kwh()) }}</td>
+		</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+	<p style="margin-top: 10px; font-size: 12px;">Formulas: E_daily = Σ(P × N × T)/1000; E_month = E_daily × 30; Cost = E_month × tariff; CO₂ = E_month × EF</p>
+</body>
+</html>
+
+

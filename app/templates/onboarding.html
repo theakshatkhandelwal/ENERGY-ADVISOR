@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h3 class="mb-0">Onboarding / Profile</h3>
+	<div class="small text-muted">These settings drive all calculations and recommendations</div>
+	</div>
+<form method="post" class="row g-4">
+	<div class="col-md-7">
+		<div class="card shadow-sm"><div class="card-body">
+			<div class="row g-3">
+				<div class="col-12">
+					<label class="form-label">Name</label>
+					<input name="name" class="form-control" value="{{ user.name or '' }}">
+				</div>
+				<div class="col-md-6">
+					<label class="form-label">City</label>
+					<input name="city" class="form-control" value="{{ user.city or '' }}">
+				</div>
+				<div class="col-md-6">
+					<label class="form-label">Household Size</label>
+					<input name="household_size" type="number" class="form-control" value="{{ user.household_size or 3 }}">
+				</div>
+			</div>
+		</div></div>
+	</div>
+	<div class="col-md-5">
+		<div class="card shadow-sm"><div class="card-body">
+			<div class="row g-3">
+				<div class="col-md-6">
+					<label class="form-label">Tariff (₹/kWh)</label>
+					<input name="tariff" type="number" step="0.01" class="form-control" value="{{ user.tariff or 8.0 }}">
+					<div class="form-text">Typical: 7–12 ₹/kWh</div>
+				</div>
+				<div class="col-md-6">
+					<label class="form-label">Grid EF (kgCO₂/kWh)</label>
+					<input name="ef" type="number" step="0.01" class="form-control" value="{{ user.ef or 0.70 }}">
+					<div class="form-text">India avg ~0.7 kgCO₂/kWh (editable in Assumptions)</div>
+				</div>
+			</div>
+		</div></div>
+	</div>
+	<div class="col-12">
+		<button class="btn btn-primary">Save</button>
+	</div>
+	</form>
+
+<div class="row g-4 mt-1">
+	<div class="col-md-7">
+		<div class="card border-0 shadow-sm">
+			<div class="card-body">
+				<div class="d-flex align-items-center justify-content-between mb-2">
+					<div class="fw-bold">Preview from your current appliances</div>
+					<a href="{{ url_for('main.appliances') }}" class="btn btn-sm btn-outline-primary">Edit appliances</a>
+				</div>
+				{% if kpis_preview %}
+				<div class="row text-center">
+					<div class="col-4">
+						<div class="text-muted small">kWh/month</div>
+						<div class="h4">{{ kpis_preview.monthly_kwh }}</div>
+					</div>
+					<div class="col-4">
+						<div class="text-muted small">₹/month</div>
+						<div class="h4">₹ {{ kpis_preview.monthly_cost }}</div>
+					</div>
+					<div class="col-4">
+						<div class="text-muted small">CO₂ kg/month</div>
+						<div class="h4">{{ kpis_preview.monthly_co2 }}</div>
+					</div>
+				</div>
+				{% else %}
+				<div class="text-muted">No appliances added yet. Use Presets on the Appliances page to get started.</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="col-md-5">
+		<div class="card border-0 shadow-sm">
+			<div class="card-body">
+				<div class="fw-bold mb-2">Quick tips</div>
+				<ul class="mb-0">
+					<li>Enter bulbs/fans/AC hours/day realistically for better accuracy.</li>
+					<li>Tariff and EF can be tuned in Assumptions to match your utility.</li>
+					<li>Use Recommendations → Apply all to draft a quick savings scenario.</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row g-4 mt-1">
+	<div class="col-md-12">
+		<div class="card border-0 shadow-sm">
+			<div class="card-body">
+				<div class="d-flex justify-content-between align-items-center">
+					<div>
+						<div class="fw-bold mb-1">What if your tariff changes?</div>
+						<div class="small text-muted">Drag to preview bill impact; doesn’t save until you hit “Save” above.</div>
+					</div>
+					<div class="d-flex align-items-center gap-2">
+						<label class="form-label mb-0 small">Tariff</label>
+						<input id="tariffPreview" type="range" min="5" max="15" step="0.5" value="{{ user.tariff or 8.0 }}" class="form-range" style="width: 220px;">
+						<span class="badge text-bg-primary" id="tariffPreviewVal">{{ user.tariff or 8.0 }}</span>
+					</div>
+				</div>
+				<div class="row align-items-center mt-3">
+					<div class="col-md-4 text-center">
+						<div class="text-muted small">₹/month (preview)</div>
+						<div class="h3" id="previewCost">—</div>
+					</div>
+					<div class="col-md-8">
+						<canvas id="tariffSpark" height="70"
+							data-kwh="{{ kpis_preview.monthly_kwh if kpis_preview else 0 }}"
+							data-ef="{{ user.ef or 0.7 }}"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+

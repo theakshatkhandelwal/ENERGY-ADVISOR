@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h3>Appliance Catalog</h3>
+	<form method="post" class="row g-2 align-items-end">
+		<div class="col-auto">
+			<label class="form-label">Type</label>
+			<input id="applianceType" name="type" class="form-control" placeholder="bulb, fan, AC, fridge" list="typeList">
+			<datalist id="typeList">
+				<option value="bulb">
+				<option value="tube">
+				<option value="fan">
+				<option value="AC">
+				<option value="fridge">
+				<option value="tv">
+				<option value="router">
+				<option value="laptop">
+				<option value="monitor">
+				<option value="wm">
+				<option value="geyser">
+				<option value="microwave">
+			</datalist>
+		</div>
+		<div class="col-auto">
+			<label class="form-label">Power (W)</label>
+			<input id="powerW" name="power_w" type="number" step="0.1" class="form-control">
+			<div class="form-text" id="powerHint"></div>
+		</div>
+		<div class="col-auto">
+			<label class="form-label">Qty</label>
+			<input name="quantity" type="number" class="form-control" value="1">
+		</div>
+		<div class="col-auto">
+			<label class="form-label">Hours/day</label>
+			<input name="hours_per_day" type="number" step="0.1" class="form-control" value="1">
+		</div>
+		<div class="col-auto">
+			<label class="form-label">Days/week</label>
+			<input name="days_per_week" type="number" step="0.1" class="form-control" value="7">
+		</div>
+		<div class="col-auto">
+			<label class="form-label">Star Label</label>
+			<input name="star_label" class="form-control" placeholder="e.g., 3-star">
+		</div>
+		<div class="col-auto">
+			<button class="btn btn-primary">Add</button>
+		</div>
+	</form>
+	</div>
+<div class="d-flex gap-2 mb-3">
+	<form method="post" action="{{ url_for('main.appliances_preset') }}">
+		<input type="hidden" name="pack" value="basic_1bhk">
+		<button class="btn btn-outline-secondary btn-sm">Add 1BHK Preset</button>
+	</form>
+	<form method="post" action="{{ url_for('main.appliances_preset') }}">
+		<input type="hidden" name="pack" value="basic_2bhk">
+		<button class="btn btn-outline-secondary btn-sm">Add 2BHK Preset</button>
+	</form>
+	<form method="post" action="{{ url_for('main.appliances_remove_type') }}" class="ms-auto d-flex align-items-center gap-2">
+		<input class="form-control form-control-sm" name="type" placeholder="Remove type e.g., fridge">
+		<button class="btn btn-outline-danger btn-sm">Remove type</button>
+	</form>
+</div>
+<div class="table-responsive">
+	<table class="table table-hover align-middle shadow-sm bg-white">
+		<thead>
+			<tr>
+				<th class="text-muted">Type</th>
+				<th class="text-muted">Power (W)</th>
+				<th class="text-muted">Qty</th>
+				<th class="text-muted">Hours/day</th>
+				<th class="text-muted">Days/week</th>
+				<th class="text-muted">Star</th>
+				<th class="text-muted">kWh/day</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for a in appliances %}
+			<tr>
+				<td>
+					{% set t = a.type.lower() %}
+					{% if t in ['bulb','tube','lighting'] %}💡{% elif t in ['fan'] %}🌀{% elif t in ['ac','air conditioner','air_conditioner'] %}❄️{% elif t in ['fridge','refrigerator'] %}🧊{% elif t in ['tv','television'] %}📺{% elif t in ['router'] %}📶{% elif t in ['laptop','computer','pc'] %}💻{% elif t in ['wm','washing machine'] %}🧺{% elif t in ['geyser','water heater'] %}🚿{% elif t in ['microwave'] %}🍲{% else %}🧩{% endif %} {{ a.type }}
+				</td>
+				<td>{{ a.power_w }}</td>
+				<td>{{ a.quantity }}</td>
+				<td>{{ a.hours_per_day }}</td>
+				<td>{{ a.days_per_week }}</td>
+				<td>{{ a.star_label or '' }}</td>
+				<td>{{ '%.3f'|format(a.daily_kwh()) }}</td>
+				<td>
+					<form method="post" action="{{ url_for('main.delete_appliance', appliance_id=a.id) }}">
+						<button class="btn btn-sm btn-outline-danger">Delete</button>
+					</form>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}
+
+

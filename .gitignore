@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+
+# Environments
+.venv/
+env/
+venv/
+
+# Flask/instance
+instance/
+app.sqlite
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node/Vercel artifacts (if used)
+node_modules/
+.vercel/
+
+
