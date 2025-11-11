@@ -90,6 +90,35 @@ def delete_appliance(appliance_id: int):
 	flash("Appliance deleted", "info")
 	return redirect(url_for("main.appliances"))
 
+@bp.route("/admin/seed-demo", methods=["POST"])
+def seed_demo():
+	"""
+	Seed a richer demo dataset for the current user if they have no appliances.
+	Intended for quick Vercel/preview setup.
+	"""
+	user = _get_or_create_default_user()
+	existing = Appliance.query.filter_by(user_id=user.id).count()
+	if existing == 0:
+		demo = [
+			{"type": "bulb", "power_w": 60, "quantity": 10, "hours_per_day": 6, "days_per_week": 7},
+			{"type": "fan", "power_w": 70, "quantity": 4, "hours_per_day": 8, "days_per_week": 7},
+			{"type": "AC", "power_w": 1200, "quantity": 1, "hours_per_day": 3, "days_per_week": 6},
+			{"type": "fridge", "power_w": 120, "quantity": 1, "hours_per_day": 24, "days_per_week": 7, "star_label": "3-star"},
+			{"type": "tv", "power_w": 90, "quantity": 1, "hours_per_day": 3, "days_per_week": 7},
+			{"type": "router", "power_w": 10, "quantity": 1, "hours_per_day": 24, "days_per_week": 7},
+			{"type": "laptop", "power_w": 60, "quantity": 1, "hours_per_day": 4, "days_per_week": 6},
+			{"type": "wm", "power_w": 500, "quantity": 1, "hours_per_day": 0.7, "days_per_week": 4},
+			{"type": "geyser", "power_w": 2000, "quantity": 1, "hours_per_day": 0.5, "days_per_week": 5},
+			{"type": "microwave", "power_w": 1200, "quantity": 1, "hours_per_day": 0.3, "days_per_week": 5},
+		]
+		for p in demo:
+			db.session.add(Appliance(user_id=user.id, **p))
+		db.session.commit()
+		flash("Demo data loaded.", "success")
+	else:
+		flash("Appliances already exist; demo not loaded.", "info")
+	return redirect(url_for("main.appliances"))
+
 
 @bp.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
